@@ -13,9 +13,18 @@ enum class PlanStatus {
 class Plan {
     public:
         Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
+           // Rule of 5
+        ~Plan();                                   // Destructor
+        Plan(const Plan &other);                   // Copy Constructor
+        Plan &operator=(const Plan &other);        // Copy Assignment
+        Plan(Plan &&other) noexcept;               // Move Constructor
+        Plan &operator=(Plan &&other) noexcept;    // Move Assignment
+
         const int getlifeQualityScore() const;
         const int getEconomyScore() const;
         const int getEnvironmentScore() const;
+        const int getPlanId() const;
+
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();
         void printStatus();
