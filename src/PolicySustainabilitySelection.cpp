@@ -1,5 +1,6 @@
 #include "SelectionPolicy.h"
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
@@ -9,7 +10,7 @@ SustainabilitySelection::SustainabilitySelection() : lastSelectedIndex(-1) {}
 // Select facility
 const FacilityType &SustainabilitySelection::selectFacility(const vector<FacilityType> &facilitiesOptions) {
     if (facilitiesOptions.empty()) {
-        throw runtime_error("No available facilities to select.");
+        cout << "No available facilities to select." << endl;
     }
 
     for (size_t i = 0; i < facilitiesOptions.size(); ++i) {
@@ -20,12 +21,12 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
         }
     }
 
-    throw runtime_error("No sustainability-related facilities available.");
+    cout << "No sustainability-related facilities available." << endl;
 }
 
 // Convert to string
 const string SustainabilitySelection::toString() const {
-    return "Sustainability Selection Policy";
+    return "Sustainability Selection Policy last selected index " + to_string(lastSelectedIndex);
 }
 
 // Clone policy

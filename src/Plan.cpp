@@ -139,6 +139,20 @@ const int Plan::getPlanId() const {
     return plan_id;
 }
 
+PlanStatus Plan::getPlanStatus() {
+    if (underConstruction.size() < getConstructionLimit()) {
+        status = PlanStatus::AVALIABLE;
+    } else {
+        status = PlanStatus::BUSY;
+    }
+    return status;
+}
+
+const int Plan::getConstructionLimit()
+{
+    return static_cast<int>(settlement.getType()) + 1;
+}
+
 // Set selection policy
 void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy) {
     delete selectionPolicy; // Free old policy
@@ -147,52 +161,54 @@ void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy) {
 
 // Simulate one step
 void Plan::step() {
-    // Step through under-construction facilities
-    for (auto it = underConstruction.begin(); it != underConstruction.end();) {
-        FacilityStatus status = (*it)->step();
+    while(getPlanStatus() == PlanStatus::AVALIABLE) {
+        addFacility(new Facility(selectionPolicy->selectFacility(facilityOptions), settlement.getName()));
+    }
+
+    for (auto facility = underConstruction.begin(); facility != underConstruction.end();) {
+        FacilityStatus status = (*facility)->step();
         if (status == FacilityStatus::OPERATIONAL) {
-            facilities.push_back(*it);
-            it = underConstruction.erase(it); // Remove from under-construction
+            facilities.push_back(*facility);
+            facility = underConstruction.erase(facility); // Remove from under-construction
         } else {
-            ++it;
+            ++facility;
         }
     }
 
     // Update scores
     life_quality_score = economy_score = environment_score = 0;
-    for (const auto &facility : facilities) {
+    for (Facility *facility : facilities) {
         life_quality_score += facility->getLifeQualityScore();
         economy_score += facility->getEconomyScore();
         environment_score += facility->getEnvironmentScore();
     }
-
     // Set status
-    if (underConstruction.size() >= static_cast<size_t>(settlement.getType())) {
-        status = PlanStatus::BUSY;
-    } else {
+    if (underConstruction.size() < getConstructionLimit()) {
         status = PlanStatus::AVALIABLE;
+    } else {
+        status = PlanStatus::BUSY;
     }
 }
 
 // Print plan status
 void Plan::printStatus() {
-    cout << "Plan ID: " << plan_id << "\n"
-         << "Settlement: " << settlement.getName() << "\n"
-         << "Status: " << (status == PlanStatus::AVALIABLE ? "Available" : "Busy") << "\n"
-         << "Scores:\n"
-         << "  Life Quality: " << life_quality_score << "\n"
-         << "  Economy: " << economy_score << "\n"
-         << "  Environment: " << environment_score << "\n";
+    cout << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "AVALIABLE" : "BUSY") << "\n";
+        //  << "Plan ID: " << plan_id << "\n"
+        //  << "SettlementName: " << settlement.getName() << "\n"
+    //      << "Scores:\n"
+    //      << "  Life Quality: " << life_quality_score << "\n"
+    //      << "  Economy: " << economy_score << "\n"
+    //      << "  Environment: " << environment_score << "\n";
 
-    cout << "Operational Facilities:\n";
-    for (const auto &facility : facilities) {
-        cout << "  - " << facility->toString() << "\n";
-    }
+    // cout << "Operational Facilities:\n";
+    // for (const auto &facility : facilities) {
+    //     cout << "  - " << facility->toString() << "\n";
+    // }
 
-    cout << "Under Construction Facilities:\n";
-    for (const auto &facility : underConstruction) {
-        cout << "  - " << facility->toString() << "\n";
-    }
+    // cout << "Under Construction Facilities:\n";
+    // for (const auto &facility : underConstruction) {
+    //     cout << "  - " << facility->toString() << "\n";
+    // }
 }
 
 // Get facilities
@@ -202,12 +218,13 @@ const vector<Facility*> &Plan::getFacilities() const {
 
 // Add a facility to under-construction
 void Plan::addFacility(Facility *facility) {
-    if (underConstruction.size() < static_cast<size_t>(settlement.getType())) {
+    if (underConstruction.size() < getConstructionLimit()) {
         underConstruction.push_back(facility);
     } else {
-        throw runtime_error("Construction limit reached for plan ID: " + to_string(plan_id));
+        cout << "Construction limit reached for plan ID: " + to_string(plan_id) << endl;
     }
 }
+
 
 // Convert to string
 const string Plan::toString() const {

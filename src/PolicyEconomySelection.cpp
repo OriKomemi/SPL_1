@@ -1,5 +1,6 @@
 #include "SelectionPolicy.h"
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
@@ -9,7 +10,7 @@ EconomySelection::EconomySelection() : lastSelectedIndex(-1) {}
 // Select facility
 const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> &facilitiesOptions) {
     if (facilitiesOptions.empty()) {
-        throw runtime_error("No available facilities to select.");
+        cout << "No available facilities to select." << endl;
     }
 
     for (size_t i = 0; i < facilitiesOptions.size(); ++i) {
@@ -20,12 +21,12 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
         }
     }
 
-    throw runtime_error("No economy-related facilities available.");
+    cout << "No economy-related facilities available." << endl;
 }
 
 // Convert to string
 const string EconomySelection::toString() const {
-    return "Economy Selection Policy";
+    return "Economy Selection Policy last selected index " + to_string(lastSelectedIndex);
 }
 
 // Clone policy

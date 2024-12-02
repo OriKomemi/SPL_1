@@ -1,6 +1,7 @@
 #include "SelectionPolicy.h"
 #include <limits>
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
@@ -10,7 +11,7 @@ BalancedSelection::BalancedSelection(int LifeQualityScore, int EconomyScore, int
 
 const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType> &facilitiesOptions) {
     if (facilitiesOptions.empty()) {
-        throw runtime_error("No available facilities to select.");
+        cout << "No available facilities to select." << endl;
     }
 
     int minDifference = numeric_limits<int>::max();
@@ -29,14 +30,15 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
     }
 
     if (!selected) {
-        throw runtime_error("Failed to select facility.");
+        cout << "Failed to select facility." << endl;
     }
 
     return *selected;
 }
 
 const string BalancedSelection::toString() const {
-    return "Balanced Selection Policy";
+    return "Balanced Selection Policy, your current balance: LifeQscore: " + to_string(LifeQualityScore) +
+    "EconomyScore: " + to_string(EconomyScore) + "EnvinromentScore: " + to_string(EnvironmentScore);
 }
 
 BalancedSelection *BalancedSelection::clone() const {

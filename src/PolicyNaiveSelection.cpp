@@ -1,5 +1,6 @@
 #include "SelectionPolicy.h"
 #include <stdexcept>
+#include <iostream>
 
 using namespace std;
 
@@ -9,7 +10,7 @@ NaiveSelection::NaiveSelection() : lastSelectedIndex(-1) {}
 // Select facility
 const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &facilitiesOptions) {
     if (facilitiesOptions.empty()) {
-        throw runtime_error("No available facilities to select.");
+        cout << "No available facilities to select." << endl;
     }
     lastSelectedIndex = (lastSelectedIndex + 1) % facilitiesOptions.size();
     return facilitiesOptions[lastSelectedIndex];
@@ -17,7 +18,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 
 // Convert to string
 const string NaiveSelection::toString() const {
-    return "Naive Selection Policy";
+    return "Naive Selection Policy last selected index " + to_string(lastSelectedIndex);
 }
 
 // Clone policy

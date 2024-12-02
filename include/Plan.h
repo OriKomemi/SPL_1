@@ -24,6 +24,8 @@ class Plan {
         const int getEconomyScore() const;
         const int getEnvironmentScore() const;
         const int getPlanId() const;
+        const int getConstructionLimit();
+        PlanStatus getPlanStatus();
 
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();

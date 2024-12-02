@@ -80,26 +80,28 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
         } else if (args[0] == "plan" && args.size() == 3) {
             string settlementName = args[1];
             string policyType = args[2];
-
-            Settlement &settlement = getSettlement(settlementName);
-            SelectionPolicy *policy = nullptr;
-
-            if (policyType == "nve") {
-                policy = new NaiveSelection();
-            } else if (policyType == "bal") {
-                policy = new BalancedSelection(0, 0, 0);
-            } else if (policyType == "eco") {
-                policy = new EconomySelection();
-            } else if (policyType == "env") {
-                policy = new SustainabilitySelection();
+            if (isSettlementExists(settlementName)) {
+                Settlement &settlement = getSettlement(settlementName);
+                SelectionPolicy *policy = nullptr;
+                if (policyType == "nve") {
+                    policy = new NaiveSelection();
+                } else if (policyType == "bal") {
+                    policy = new BalancedSelection(0, 0, 0);
+                } else if (policyType == "eco") {
+                    policy = new EconomySelection();
+                } else if (policyType == "env") {
+                    policy = new SustainabilitySelection();
+                } else {
+                    cout << "Invalid selection policy in line: " << line << endl;
+                    continue;
+                }
+                addPlan(settlement, policy);
             } else {
-                cerr << "Invalid selection policy in line: " << line << endl;
-                continue;
+                cout << "Settlement: " + settlementName + " do not exists" << endl;
             }
 
-            addPlan(settlement, policy);
         } else {
-            cerr << "Invalid line format: " << line << endl;
+            cout << "Invalid line format: " << line << endl;
         }
     }
 
@@ -110,6 +112,35 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
 void Simulation::start() {
     isRunning = true;
     cout << "The simulation has started" << endl;
+
+    string command;
+    while (isRunning) {
+        cout << "> ";
+        getline(cin, command);
+        vector<string> args = Auxiliary::parseArguments(command);
+
+        if (args.empty()) continue;
+
+        if (args[0] == "step") {
+            if (args.size() != 2) {
+                cout << "Invalid syntax for step command" << endl;
+                continue;
+            }
+            int steps = stoi(args[1]);
+            for(int i=0; i<steps; i++)
+                step();
+        } else if (args[0] == "plan") {
+            // Implement plan creation command
+        } else if (args[0] == "facility") {
+            // Implement facility addition command
+        } else if (args[0] == "settlement") {
+            // Implement settlement addition command
+        } else if (args[0] == "close") {
+            close();
+        } else {
+            cout << "Unknown command: " << args[0] << endl;
+        }
+    }
 }
 
 // Add a plan to the simulation
@@ -160,7 +191,7 @@ Settlement &Simulation::getSettlement(const string &settlementName) {
             return *settlement;
         }
     }
-    throw runtime_error("Settlement not found: " + settlementName);
+    cout << ("Settlement not found: " + settlementName) << endl;
 }
 
 // Retrieve a plan by ID
@@ -170,7 +201,7 @@ Plan &Simulation::getPlan(const int planID) {
             return plan;
         }
     }
-    throw runtime_error("Plan not found: " + to_string(planID));
+    cout << "Plan not found: " + to_string(planID) << endl;
 }
 
 // Step through the simulation
