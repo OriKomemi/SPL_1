@@ -1,5 +1,6 @@
 #include "Action.h"
 #include <string>
+#include <iostream>
 
 
 BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
@@ -104,4 +105,79 @@ AddSettlement *AddSettlement::clone() const {
 const string AddSettlement::toString() const
 {
     return string();
+}
+
+AddFacility::AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore):
+facilityName(facilityName), facilityCategory(facilityCategory), price(price), lifeQualityScore(lifeQualityScore), economyScore(economyScore), environmentScore(environmentScore) {}
+
+void AddFacility::act(Simulation &simulation)
+{
+    FacilityType facility(facilityName, facilityCategory, price, lifeQualityScore, economyScore, environmentScore);
+    if (!simulation.addFacility(facility)) {
+        error("Facility alreadyexists");
+    } else {
+        complete();
+    }
+}
+
+AddFacility *AddFacility::clone() const
+{
+    return new AddFacility(*this);
+}
+
+const string AddFacility::toString() const
+{
+    return string();
+}
+
+PrintPlanStatus::PrintPlanStatus(int planId): planId(planId) {}
+
+void PrintPlanStatus::act(Simulation &simulation)
+{
+
+    Plan plan = simulation.getPlan(planId);
+    plan.printStatus();
+    complete();
+}
+
+BackupSimulation::BackupSimulation() {}
+
+void BackupSimulation::act(Simulation &simulation) {
+    if (backup != nullptr) {
+        delete backup;
+    }
+    backup = simulation.clone();
+    complete();
+}
+
+BackupSimulation* BackupSimulation::clone() const {
+    return new BackupSimulation(*this);
+}
+
+const string BackupSimulation::toString() const {
+    return "backup COMPLETED";
+}
+
+RestoreSimulation::RestoreSimulation() {}
+
+void RestoreSimulation::act(Simulation &simulation) {
+    if (backup == nullptr) {
+        error("No backup available");
+        return;
+    }
+
+    simulation = *backup;
+    complete();
+}
+
+RestoreSimulation* RestoreSimulation::clone() const {
+    return new RestoreSimulation(*this);
+}
+
+const std::string RestoreSimulation::toString() const {
+    if (getStatus() == ActionStatus::COMPLETED) {
+        return "restore COMPLETED";
+    } else {
+        return "restore ERROR: " + getErrorMsg();
+    }
 }

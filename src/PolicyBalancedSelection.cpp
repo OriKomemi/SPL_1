@@ -41,6 +41,11 @@ const string BalancedSelection::toString() const {
     "EconomyScore: " + to_string(EconomyScore) + "EnvinromentScore: " + to_string(EnvironmentScore);
 }
 
+const string BalancedSelection::getPolicyType() const
+{
+    return "bal";
+}
+
 BalancedSelection *BalancedSelection::clone() const {
     return new BalancedSelection(*this);
 }

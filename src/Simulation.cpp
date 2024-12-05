@@ -2,6 +2,7 @@
 #include "Auxiliary.h"
 #include "Plan.h"
 #include "SelectionPolicy.h"
+#include "Action.h"
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -10,6 +11,7 @@
 
 using namespace std;
 
+Simulation* backup = nullptr;
 // Constructor: Initialize simulation and parse the configuration file
 Simulation::Simulation(const string &configFilePath) : isRunning(false), planCounter(0), actionsLog(), plans(), settlements(), facilitiesOptions(){
     ifstream configFile(configFilePath);
@@ -75,7 +77,7 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
 
             FacilityType facility(name, facilityCategory, price, lifeQualityScore, economyScore, environmentScore);
             if (!addFacility(facility)) {
-                cerr << "Duplicate facility: " << name << endl;
+                cout << "Duplicate facility: " << name << endl;
             }
         } else if (args[0] == "plan" && args.size() == 3) {
             string settlementName = args[1];
@@ -107,6 +109,26 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
 
     configFile.close();
 }
+
+Simulation::Simulation(const Simulation &other)
+    : isRunning(other.isRunning),
+      planCounter(other.planCounter) {
+
+    for (const auto &action : other.actionsLog) {
+        actionsLog.push_back(action->clone());
+    }
+
+    for (const auto &plan : other.plans) {
+        plans.push_back(plan); // Assuming Plan has a copy constructor
+    }
+
+    for (const auto &settlement : other.settlements) {
+        settlements.push_back(new Settlement(*settlement));
+    }
+
+    facilitiesOptions = other.facilitiesOptions;
+}
+
 
 // Start the simulation
 void Simulation::start() {
@@ -194,6 +216,16 @@ Settlement &Simulation::getSettlement(const string &settlementName) {
     cout << ("Settlement not found: " + settlementName) << endl;
 }
 
+bool Simulation::isPlanExisit(const int planID)
+{
+    for (auto &plan : plans) {
+        if (plan.getPlanId() == planID) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Retrieve a plan by ID
 Plan &Simulation::getPlan(const int planID) {
     for (auto &plan : plans) {
@@ -220,4 +252,9 @@ void Simulation::close() {
 // Open the simulation (not fully implemented)
 void Simulation::open() {
     cerr << "open not implemented yet" << endl;
+}
+
+Simulation *Simulation::clone() const
+{
+    return new Simulation(*this);
 }

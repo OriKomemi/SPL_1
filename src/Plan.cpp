@@ -192,23 +192,19 @@ void Plan::step() {
 
 // Print plan status
 void Plan::printStatus() {
-    cout << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "AVALIABLE" : "BUSY") << "\n";
-        //  << "Plan ID: " << plan_id << "\n"
-        //  << "SettlementName: " << settlement.getName() << "\n"
-    //      << "Scores:\n"
-    //      << "  Life Quality: " << life_quality_score << "\n"
-    //      << "  Economy: " << economy_score << "\n"
-    //      << "  Environment: " << environment_score << "\n";
+    cout << "PlanID: " << plan_id << "\n"
+         << "SettlementName: " << settlement.getName() << "\n"
+         << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "AVALIABLE" : "BUSY") << " // PlanStatus enum\n"
+         << "\nSelectionPolicy: " << selectionPolicy->getPolicyType() << "\n"
+         << "LifeQualityScore: " << life_quality_score << "\n"
+         << "EconomyScore: " << economy_score << "\n"
+         << "EnvironmentScore: " << environment_score << "\n";
 
-    // cout << "Operational Facilities:\n";
-    // for (const auto &facility : facilities) {
-    //     cout << "  - " << facility->toString() << "\n";
-    // }
-
-    // cout << "Under Construction Facilities:\n";
-    // for (const auto &facility : underConstruction) {
-    //     cout << "  - " << facility->toString() << "\n";
-    // }
+    // Print facilities under construction
+    for (const auto &facility : underConstruction) {
+        cout << "FacilityName: " << facility->getName() << "\n"
+             << "FacilityStatus: UNDER_CONSTRUCTION\n";
+    }
 }
 
 // Get facilities

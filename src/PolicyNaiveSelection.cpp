@@ -21,6 +21,9 @@ const string NaiveSelection::toString() const {
     return "Naive Selection Policy last selected index " + to_string(lastSelectedIndex);
 }
 
+const string NaiveSelection::getPolicyType() const {
+    return "nav";
+}
 // Clone policy
 NaiveSelection *NaiveSelection::clone() const {
     return new NaiveSelection(*this);

@@ -29,6 +29,11 @@ const string EconomySelection::toString() const {
     return "Economy Selection Policy last selected index " + to_string(lastSelectedIndex);
 }
 
+const string EconomySelection::getPolicyType() const
+{
+    return "eco";
+}
+
 // Clone policy
 EconomySelection *EconomySelection::clone() const {
     return new EconomySelection(*this);

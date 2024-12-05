@@ -29,6 +29,11 @@ const string SustainabilitySelection::toString() const {
     return "Sustainability Selection Policy last selected index " + to_string(lastSelectedIndex);
 }
 
+const string SustainabilitySelection::getPolicyType() const
+{
+    return "env";
+}
+
 // Clone policy
 SustainabilitySelection *SustainabilitySelection::clone() const {
     return new SustainabilitySelection(*this);
