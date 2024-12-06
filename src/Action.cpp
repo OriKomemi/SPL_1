@@ -4,6 +4,7 @@
 #include "Plan.h"
 #include <string>
 #include <iostream>
+#include <iostream>
 
 
 BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
@@ -115,6 +116,89 @@ const std::string AddSettlement::toString() const {
     }
 }
 
+PrintPlanStatus::PrintPlanStatus(int planId) : planId(planId) {}
+
+void PrintPlanStatus::act(Simulation &simulation) {
+    if (!simulation.isPlanExists(planId)) {
+        error("Plan doesn’t exist");
+        return;
+    }
+    Plan plan = simulation.getPlan(planId);
+    plan.printStatus();
+
+    complete(); // Mark action as completed
+}
+
+PrintPlanStatus *PrintPlanStatus::clone() const {
+    return new PrintPlanStatus(*this);
+}
+
+const string PrintPlanStatus::toString() const {
+    if (getStatus() == ActionStatus::COMPLETED) {
+        return "planStatus " + std::to_string(planId) + " COMPLETED";
+    } else {
+        return "planStatus " + std::to_string(planId) + " ERROR: " + getErrorMsg();
+    }
+}
+
+ChangePlanPolicy::ChangePlanPolicy(const int planId, const string &newPolicy) : planId(planId), newPolicy(newPolicy) {}
+
+void ChangePlanPolicy::act(Simulation &simulation) {
+    if (!simulation.isPlanExists(planId)) {
+        error("Cannot change selection policy");
+        return;
+    }
+    Plan plan = simulation.getPlan(planId);
+    SelectionPolicy *newSelectionPolicy = nullptr;
+
+    if(newPolicy == "nev") {
+        newSelectionPolicy = new NaiveSelection();
+    }
+    else if (newPolicy == "eco") {
+        newSelectionPolicy = new EconomySelection();
+    }
+    else if (newPolicy == "env") {
+        newSelectionPolicy = new SustainabilitySelection();
+    }
+    else if (newPolicy == "bal") {
+        newSelectionPolicy = new BalancedSelection(plan.getLifeQualityScore(), plan.getEconomyScore(), plan.getEnvironmentScore());
+    }
+    else {
+        error("Cannot change selection policy");
+        return;
+    }
+    plan.setSelectionPolicy(newSelectionPolicy);
+
+    complete(); // Mark action as completed
+}
+
+ChangePlanPolicy *ChangePlanPolicy::clone() const {
+    return new ChangePlanPolicy(*this);
+}
+
+const std::string ChangePlanPolicy::toString() const {
+    if (getStatus() == ActionStatus::COMPLETED) {
+        return "changePolicy " + std::to_string(planId) + " " + newPolicy + " COMPLETED";
+    } else {
+        return "changePolicy " + std::to_string(planId) + " " + newPolicy + " ERROR: " + getErrorMsg();
+    }
+}
+
+Close::Close() {}
+
+void Close::act(Simulation &simulation) {
+    simulation.close();
+    complete(); // Mark action as completed
+}
+
+Close *Close::clone() const {
+    return new Close(*this);
+}
+
+const string Close::toString() const {
+    return "close COMPLETED";
+}
+
 AddFacility::AddFacility(const string &facilityName, const FacilityCategory facilityCategory, const int price, const int lifeQualityScore, const int economyScore, const int environmentScore):
 facilityName(facilityName), facilityCategory(facilityCategory), price(price), lifeQualityScore(lifeQualityScore), economyScore(economyScore), environmentScore(environmentScore) {}
 
@@ -142,29 +226,6 @@ const std::string AddFacility::toString() const {
         return "facility " + facilityName + " " + std::to_string(static_cast<int>(facilityCategory)) + " " +
                std::to_string(price) + " " + std::to_string(lifeQualityScore) + " " +
                std::to_string(economyScore) + " " + std::to_string(environmentScore) + " ERROR: " + getErrorMsg();
-    }
-}
-
-PrintPlanStatus::PrintPlanStatus(int planId): planId(planId) {}
-
-void PrintPlanStatus::act(Simulation &simulation)
-{
-
-    Plan plan = simulation.getPlan(planId);
-    plan.printStatus();
-    complete();
-}
-
-PrintPlanStatus *PrintPlanStatus::clone() const
-{
-    return new PrintPlanStatus(*this);;
-}
-
-const std::string PrintPlanStatus::toString() const {
-    if (getStatus() == ActionStatus::COMPLETED) {
-        return "planStatus " + std::to_string(planId) + " COMPLETED";
-    } else {
-        return "planStatus " + std::to_string(planId) + " ERROR: " + getErrorMsg();
     }
 }
 
@@ -207,57 +268,6 @@ const std::string RestoreSimulation::toString() const {
         return "restore COMPLETED";
     } else {
         return "restore ERROR: " + getErrorMsg();
-    }
-}
-
-ChangePlanPolicy::ChangePlanPolicy(const int planId, const std::string &newPolicy)
-    : planId(planId), newPolicy(newPolicy) {}
-
-void ChangePlanPolicy::act(Simulation &simulation) {
-    if (!simulation.isPlanExisit(planId)) {
-        error("Cannot change selection policy: Plan ID does not exist");
-        return;
-    }
-
-    // Get the plan and its current policy
-    Plan& plan = simulation.getPlan(planId);
-    std::string previousPolicy = plan.getSelectionPolicyType();
-
-    // Check if the new policy is the same as the current policy
-    if (previousPolicy == newPolicy) {
-        error("Cannot change selection policy: Policy is already set to the desired value");
-        return;
-    }
-
-    // Create the new selection policy
-    SelectionPolicy* newPolicyObj = nullptr;
-    if (newPolicy == "nve") {
-        newPolicyObj = new NaiveSelection();
-    } else if (newPolicy == "bal") {
-        newPolicyObj = new BalancedSelection(plan.getlifeQualityScore(), plan.getEconomyScore(), plan.getEnvironmentScore());
-    } else if (newPolicy == "eco") {
-        newPolicyObj = new EconomySelection();
-    } else if (newPolicy == "env") {
-        newPolicyObj = new SustainabilitySelection();
-    } else {
-        error("Cannot change selection policy: Invalid policy type");
-        return;
-    }
-
-    // Change the policy
-    plan.setSelectionPolicy(newPolicyObj);
-    complete(); // Mark action as completed
-}
-
-ChangePlanPolicy* ChangePlanPolicy::clone() const {
-    return new ChangePlanPolicy(*this);
-}
-
-const std::string ChangePlanPolicy::toString() const {
-    if (getStatus() == ActionStatus::COMPLETED) {
-        return "changePolicy " + std::to_string(planId) + " " + newPolicy + " COMPLETED";
-    } else {
-        return "changePolicy " + std::to_string(planId) + " " + newPolicy + " ERROR: " + getErrorMsg();
     }
 }
 

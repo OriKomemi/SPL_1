@@ -26,7 +26,7 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
 
 // Convert to string
 const string SustainabilitySelection::toString() const {
-    return "Sustainability Selection Policy last selected index " + to_string(lastSelectedIndex);
+    return "env";
 }
 
 const string SustainabilitySelection::getPolicyType() const

@@ -26,11 +26,10 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
 
 // Convert to string
 const string EconomySelection::toString() const {
-    return "Economy Selection Policy last selected index " + to_string(lastSelectedIndex);
+    return "eco";
 }
 
-const string EconomySelection::getPolicyType() const
-{
+const string EconomySelection::getPolicyType() const {
     return "eco";
 }
 

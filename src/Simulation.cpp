@@ -247,6 +247,12 @@ bool Simulation::isSettlementExists(const string &settlementName) {
     }
     return false;
 }
+bool Simulation::isPlanExists(const int planID) {
+    if (planID > planCounter) {
+        return false;
+    }
+    return true;
+}
 
 // Retrieve a settlement by name
 Settlement &Simulation::getSettlement(const string &settlementName) {
@@ -292,6 +298,9 @@ void Simulation::step() {
 
 // Close the simulation
 void Simulation::close() {
+    for(int i=0; i++; i<plans.size()) {
+    plans[i].printShortStatus();
+    }
     isRunning = false;
     cout << "Simulation closed" << endl;
 }

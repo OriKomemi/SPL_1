@@ -20,7 +20,7 @@ class Plan {
         Plan(Plan &&other) noexcept;               // Move Constructor
         Plan &operator=(Plan &&other) noexcept;    // Move Assignment
 
-        const int getlifeQualityScore() const;
+        const int getLifeQualityScore() const;
         const int getEconomyScore() const;
         const int getEnvironmentScore() const;
         const int getPlanId() const;
@@ -31,6 +31,7 @@ class Plan {
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();
         void printStatus();
+        void printShortStatus();
         const vector<Facility*> &getFacilities() const;
         void addFacility(Facility* facility);
         const string toString() const;

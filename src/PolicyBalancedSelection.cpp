@@ -37,8 +37,7 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
 }
 
 const string BalancedSelection::toString() const {
-    return "Balanced Selection Policy, your current balance: LifeQscore: " + to_string(LifeQualityScore) +
-    "EconomyScore: " + to_string(EconomyScore) + "EnvinromentScore: " + to_string(EnvironmentScore);
+    return "bal";
 }
 
 const string BalancedSelection::getPolicyType() const

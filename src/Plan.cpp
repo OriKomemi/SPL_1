@@ -123,7 +123,7 @@ Plan &Plan::operator=(Plan &&other) noexcept {
 
 
 // Getters for scores
-const int Plan::getlifeQualityScore() const {
+const int Plan::getLifeQualityScore() const {
     return life_quality_score;
 }
 
@@ -160,8 +160,15 @@ const int Plan::getConstructionLimit()
 
 // Set selection policy
 void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy) {
+    if (selectionPolicy->toString()==newSelectionPolicy->toString()) {
+        delete newSelectionPolicy;
+        std::cout << "Cannot change selection policy" << std::endl;
+    }
+    std::cout << "planID: " << plan_id << std::endl;
+    std::cout << "previousPolicy: " << selectionPolicy->toString() << std::endl;
     delete selectionPolicy; // Free old policy
     selectionPolicy = newSelectionPolicy;
+    std::cout << "newPolicy: " << selectionPolicy->toString() << std::endl;
 }
 
 // Simulate one step
@@ -197,20 +204,30 @@ void Plan::step() {
 
 // Print plan status
 void Plan::printStatus() {
-    cout << "PlanID: " << plan_id << "\n"
-         << "SettlementName: " << settlement.getName() << "\n"
-         << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "AVALIABLE" : "BUSY") << "\n"
-         << "SelectionPolicy: " << selectionPolicy->getPolicyType() << "\n"
-         << "LifeQualityScore: " << life_quality_score << "\n"
-         << "EconomyScore: " << economy_score << "\n"
-         << "EnvironmentScore: " << environment_score << "\n";
-
-    // Print facilities under construction
-    for (const auto &facility : underConstruction) {
-        cout << "FacilityName: " << facility->getName() << "\n"
-             << "FacilityStatus: UNDER_CONSTRUCTION\n";
+    std::cout << "PlanID: " << plan_id << std::endl;
+    std::cout << "SettlementName: " << settlement.getName() << std::endl;
+    std::cout << "PlanStatus: " << (status == PlanStatus::BUSY ? "BUSY" : "AVAILABLE") << std::endl;
+    std::cout << "SelectionPolicy: " << selectionPolicy->toString() << std::endl;
+    std::cout << "LifeQualityScore: " << life_quality_score << std::endl;
+    std::cout << "EconomyScore: " << economy_score << std::endl;
+    std::cout << "EnvironmentScore: " << environment_score << std::endl;
+    for (int i = 0; i < facilities.size(); ++i) {
+        std::cout << "FacilityName: " << facilities[i]->getName() << std::endl;
+        std::cout << "FacilityStatus: OPERATIONAL" << std::endl;
+    }
+    for (int i = 0; i < underConstruction.size(); ++i) {
+        std::cout << "FacilityName: " << facilities[i]->getName() << std::endl;
+        std::cout << "FacilityStatus: UNDERCONSTRUCTIONS" << std::endl;
     }
 }
+void Plan::printShortStatus() {
+    std::cout << "PlanID: " << plan_id << std::endl;
+    std::cout << "SettlementName: " << settlement.getName() << std::endl;
+    std::cout << "LifeQualityScore: " << life_quality_score << std::endl;
+    std::cout << "EconomyScore: " << economy_score << std::endl;
+    std::cout << "EnvironmentScore: " << environment_score << std::endl;
+}
+
 
 // Get facilities
 const vector<Facility*> &Plan::getFacilities() const {

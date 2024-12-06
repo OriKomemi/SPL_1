@@ -18,7 +18,7 @@ const FacilityType &NaiveSelection::selectFacility(const vector<FacilityType> &f
 
 // Convert to string
 const string NaiveSelection::toString() const {
-    return "Naive Selection Policy last selected index " + to_string(lastSelectedIndex);
+    return "nve";
 }
 
 const string NaiveSelection::getPolicyType() const {
