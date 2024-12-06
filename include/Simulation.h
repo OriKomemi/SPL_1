@@ -10,13 +10,11 @@ using std::vector;
 class BaseAction;
 class SelectionPolicy;
 
-extern Simulation* backup;
-
 class Simulation {
     public:
         Simulation(const string &configFilePath);
+        Simulation(const Simulation &other);
         void start();
-        Simulation(Simulation *other);
         void addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy);
         void addAction(BaseAction *action);
         bool addSettlement(Settlement *settlement);
@@ -25,6 +23,7 @@ class Simulation {
         Settlement &getSettlement(const string &settlementName);
         bool isPlanExisit(const int planID);
         Plan &getPlan(const int planID);
+        const std::vector<BaseAction*>& getActionsLog() const;
         void step();
         void close();
         void open();

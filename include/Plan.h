@@ -26,6 +26,7 @@ class Plan {
         const int getPlanId() const;
         const int getConstructionLimit();
         PlanStatus getPlanStatus();
+        const string getSelectionPolicyType();
 
         void setSelectionPolicy(SelectionPolicy *selectionPolicy);
         void step();

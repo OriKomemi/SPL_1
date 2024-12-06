@@ -148,6 +148,11 @@ PlanStatus Plan::getPlanStatus() {
     return status;
 }
 
+const string Plan::getSelectionPolicyType()
+{
+    return this->selectionPolicy->getPolicyType();
+}
+
 const int Plan::getConstructionLimit()
 {
     return static_cast<int>(settlement.getType()) + 1;
@@ -194,8 +199,8 @@ void Plan::step() {
 void Plan::printStatus() {
     cout << "PlanID: " << plan_id << "\n"
          << "SettlementName: " << settlement.getName() << "\n"
-         << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "AVALIABLE" : "BUSY") << " // PlanStatus enum\n"
-         << "\nSelectionPolicy: " << selectionPolicy->getPolicyType() << "\n"
+         << "PlanStatus: " << (status == PlanStatus::AVALIABLE ? "AVALIABLE" : "BUSY") << "\n"
+         << "SelectionPolicy: " << selectionPolicy->getPolicyType() << "\n"
          << "LifeQualityScore: " << life_quality_score << "\n"
          << "EconomyScore: " << economy_score << "\n"
          << "EnvironmentScore: " << environment_score << "\n";

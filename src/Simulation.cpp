@@ -11,7 +11,7 @@
 
 using namespace std;
 
-Simulation* backup = nullptr;
+Simulation *backupSim = nullptr;
 // Constructor: Initialize simulation and parse the configuration file
 Simulation::Simulation(const string &configFilePath) : isRunning(false), planCounter(0), actionsLog(), plans(), settlements(), facilitiesOptions(){
     ifstream configFile(configFilePath);
@@ -110,8 +110,7 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
     configFile.close();
 }
 
-Simulation::Simulation(const Simulation &other)
-    : isRunning(other.isRunning),
+Simulation::Simulation(const Simulation &other): isRunning(other.isRunning),
       planCounter(other.planCounter) {
 
     for (const auto &action : other.actionsLog) {
@@ -125,45 +124,88 @@ Simulation::Simulation(const Simulation &other)
     for (const auto &settlement : other.settlements) {
         settlements.push_back(new Settlement(*settlement));
     }
-
-    facilitiesOptions = other.facilitiesOptions;
+    for (const auto &facilityOption : other.facilitiesOptions) {
+        facilitiesOptions.push_back(facilityOption);
+    }
 }
 
 
 // Start the simulation
 void Simulation::start() {
     isRunning = true;
-    cout << "The simulation has started" << endl;
+    std::string command;
 
-    string command;
+    std::cout << "The simulation has started" << std::endl;
+
     while (isRunning) {
-        cout << "> ";
-        getline(cin, command);
+        std::cout << "> ";
+        std::getline(std::cin, command);
+
         vector<string> args = Auxiliary::parseArguments(command);
 
         if (args.empty()) continue;
 
-        if (args[0] == "step") {
-            if (args.size() != 2) {
-                cout << "Invalid syntax for step command" << endl;
+        // Match commands and execute actions
+        BaseAction* action = nullptr;
+
+        try {
+            if (args[0] == "step" && args.size() == 2) {
+                int steps = std::stoi(args[1]);
+                action = new SimulateStep(steps);
+
+            } else if (args[0] == "plan" && args.size() == 3) {
+                action = new AddPlan(args[1], args[2]);
+
+            } else if (args[0] == "settlement" && args.size() == 3) {
+                SettlementType type = static_cast<SettlementType>(std::stoi(args[2]));
+                action = new AddSettlement(args[1], type);
+
+            } else if (args[0] == "facility" && args.size() == 7) {
+                FacilityCategory category = static_cast<FacilityCategory>(std::stoi(args[2]));
+                int price = std::stoi(args[3]);
+                int lifeQualityScore = std::stoi(args[4]);
+                int economyScore = std::stoi(args[5]);
+                int environmentScore = std::stoi(args[6]);
+                action = new AddFacility(args[1], category, price, lifeQualityScore, economyScore, environmentScore);
+
+            } else if (args[0] == "planStatus" && args.size() == 2) {
+                int planID = std::stoi(args[1]);
+                action = new PrintPlanStatus(planID);
+
+            } else if (args[0] == "changePolicy" && args.size() == 3) {
+                int planID = std::stoi(args[1]);
+                action = new ChangePlanPolicy(planID, args[2]);
+
+            } else if (args[0] == "log" && args.size() == 1) {
+                action = new PrintActionsLog();
+
+            } else if (args[0] == "backup" && args.size() == 1) {
+                action = new BackupSimulation();
+
+            } else if (args[0] == "restore" && args.size() == 1) {
+                action = new RestoreSimulation();
+
+            } else if (args[0] == "close" && args.size() == 1) {
+                // action = new Close();
+            } else {
+                std::cout << "Unknown command: " << args[0] << std::endl;
                 continue;
             }
-            int steps = stoi(args[1]);
-            for(int i=0; i<steps; i++)
-                step();
-        } else if (args[0] == "plan") {
-            // Implement plan creation command
-        } else if (args[0] == "facility") {
-            // Implement facility addition command
-        } else if (args[0] == "settlement") {
-            // Implement settlement addition command
-        } else if (args[0] == "close") {
-            close();
-        } else {
-            cout << "Unknown command: " << args[0] << endl;
+
+            // Execute the action and add to the log
+            if (action) {
+                action->act(*this);
+                actionsLog.push_back(action);
+                std::cout << action->toString() << std::endl;
+            }
+
+        } catch (const std::exception& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            if (action) delete action; // Clean up if an action was created but failed
         }
     }
 }
+
 
 // Add a plan to the simulation
 void Simulation::addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy) {
@@ -235,6 +277,11 @@ Plan &Simulation::getPlan(const int planID) {
     }
     cout << "Plan not found: " + to_string(planID) << endl;
 }
+
+const std::vector<BaseAction*>& Simulation::getActionsLog() const {
+    return actionsLog;
+}
+
 
 // Step through the simulation
 void Simulation::step() {
