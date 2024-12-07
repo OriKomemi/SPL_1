@@ -42,14 +42,14 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
                     settlementType = SettlementType::METROPOLIS;
                     break;
                 default:
-                    cerr << "Invalid settlement type in line: " << line << endl;
+                    cout << "Invalid settlement type in line: " << line << endl;
                     continue;
             }
 
             Settlement *settlement = new Settlement(name, settlementType);
             if (!addSettlement(settlement)) {
                 delete settlement;
-                cerr << "Duplicate settlement: " << name << endl;
+                cout << "Duplicate settlement: " << name << endl;
             }
         } else if (args[0] == "facility" && args.size() == 7) {
             string name = args[1];
@@ -71,7 +71,7 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
                     facilityCategory = FacilityCategory::ENVIRONMENT;
                     break;
                 default:
-                    cerr << "Invalid facility category in line: " << line << endl;
+                    cout << "Invalid facility category in line: " << line << endl;
                     continue;
             }
 
@@ -117,18 +117,106 @@ Simulation::Simulation(const Simulation &other): isRunning(other.isRunning),
         actionsLog.push_back(action->clone());
     }
 
-    for (const auto &plan : other.plans) {
-        plans.push_back(plan); // Assuming Plan has a copy constructor
-    }
-
     for (const auto &settlement : other.settlements) {
         settlements.push_back(new Settlement(*settlement));
     }
+
     for (const auto &facilityOption : other.facilitiesOptions) {
         facilitiesOptions.push_back(facilityOption);
     }
+
+    // Deep copy the plans vector
+    for (const Plan &plan: other.plans) {
+        plans.push_back(plan.cloneDeep(settlements, facilitiesOptions));
+    }
+
+
 }
 
+Simulation::Simulation(const Simulation &&other) : isRunning(other.isRunning),
+      planCounter(other.planCounter),
+      actionsLog(std::move(other.actionsLog)),
+      plans(std::move(other.plans)),
+      settlements(std::move(other.settlements)),
+      facilitiesOptions(std::move(other.facilitiesOptions))
+{
+}
+
+Simulation& Simulation::operator=(const Simulation &other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    // Clear existing resources to prevent memory leaks
+    clear();
+
+
+    isRunning = other.isRunning;
+    planCounter = other.planCounter;
+    for (const FacilityType &facility : other.facilitiesOptions)
+    {
+        facilitiesOptions.push_back(facility);
+    }
+    // Deep copy the actionsLog vector
+    for (auto* action : other.actionsLog) {
+        actionsLog.push_back(action->clone()); // Assuming BaseAction has a clone method
+    }
+        // Deep copy the settlements vector
+    for (auto* settlement : other.settlements) {
+        settlements.push_back(new Settlement(*settlement)); // Deep copy each settlement
+    }
+
+    // Deep copy the plans vector
+    for (const Plan &plan: other.plans) {
+        plans.push_back(plan.cloneDeep(settlements, facilitiesOptions));
+    }
+
+    return *this;
+}
+
+// Simulation &Simulation::operator=(const Simulation &&other) {
+//     if (this == &other) {
+//         return *this;
+//     }
+
+//     isRunning = other.isRunning;
+//     planCounter = other.planCounter;
+//     actionsLog = std::move(other.actionsLog);
+//     plans = std::move(other.plans);
+//     settlements = std::move(other.settlements);
+//     facilitiesOptions = std::move(other.facilitiesOptions);
+
+//     for (auto *action : actionsLog) {
+//         delete action;
+//     }
+//     actionsLog.clear();
+
+//     for (auto *settlement : settlements) {
+//         delete settlement;
+//     }
+//     settlements.clear();
+//     return *this;
+// }
+
+Simulation::~Simulation() {
+    clear();
+}
+
+void Simulation::clear() {
+    // Delete dynamically allocated actions
+    for (BaseAction* action : actionsLog) {
+        delete action;
+    }
+    actionsLog.clear();
+
+    // Delete dynamically allocated settlements
+    for (Settlement* settlement : settlements) {
+        delete settlement;
+    }
+    settlements.clear();
+    plans.clear();
+    facilitiesOptions.clear();
+}
 
 // Start the simulation
 void Simulation::start() {
@@ -186,7 +274,7 @@ void Simulation::start() {
                 action = new RestoreSimulation();
 
             } else if (args[0] == "close" && args.size() == 1) {
-                // action = new Close();
+                action = new Close();
             } else {
                 std::cout << "Unknown command: " << args[0] << std::endl;
                 continue;
@@ -196,7 +284,7 @@ void Simulation::start() {
             if (action) {
                 action->act(*this);
                 actionsLog.push_back(action);
-                std::cout << action->toString() << std::endl;
+                // std::cout << action->toString() << std::endl;
             }
 
         } catch (const std::exception& e) {
@@ -247,8 +335,9 @@ bool Simulation::isSettlementExists(const string &settlementName) {
     }
     return false;
 }
+
 bool Simulation::isPlanExists(const int planID) {
-    if (planID > planCounter) {
+    if (planID > planCounter-1) {
         return false;
     }
     return true;
@@ -262,16 +351,6 @@ Settlement &Simulation::getSettlement(const string &settlementName) {
         }
     }
     cout << ("Settlement not found: " + settlementName) << endl;
-}
-
-bool Simulation::isPlanExisit(const int planID)
-{
-    for (auto &plan : plans) {
-        if (plan.getPlanId() == planID) {
-            return true;
-        }
-    }
-    return false;
 }
 
 // Retrieve a plan by ID
@@ -288,7 +367,6 @@ const std::vector<BaseAction*>& Simulation::getActionsLog() const {
     return actionsLog;
 }
 
-
 // Step through the simulation
 void Simulation::step() {
     for (auto &plan : plans) {
@@ -298,8 +376,8 @@ void Simulation::step() {
 
 // Close the simulation
 void Simulation::close() {
-    for(int i=0; i++; i<plans.size()) {
-    plans[i].printShortStatus();
+    for(auto &plan : plans) {
+        plan.printShortStatus();
     }
     isRunning = false;
     cout << "Simulation closed" << endl;
@@ -307,7 +385,7 @@ void Simulation::close() {
 
 // Open the simulation (not fully implemented)
 void Simulation::open() {
-    cerr << "open not implemented yet" << endl;
+    cout << "open not implemented yet" << endl;
 }
 
 Simulation *Simulation::clone() const

@@ -18,7 +18,7 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
     const FacilityType *selected = nullptr;
 
     for (const auto &facility : facilitiesOptions) {
-        int scoreA = LifeQualityScore + facility.getLifeQualityScore();
+        int scoreA = LifeQualityScore + facility.getlifeQualityScore();
         int scoreB = EconomyScore + facility.getEconomyScore();
         int scoreC = EnvironmentScore + facility.getEnvironmentScore();
         int difference = max(abs(scoreA - scoreB), abs(scoreB - scoreC));

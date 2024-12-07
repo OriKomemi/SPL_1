@@ -31,6 +31,11 @@ FacilityStatus Facility::step() {
     return status;
 }
 
+Facility *Facility::clone() const
+{
+    return new Facility(*this);
+}
+
 void Facility::setStatus(FacilityStatus status) {
     this->status = status;
 }

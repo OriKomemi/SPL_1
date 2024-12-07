@@ -12,15 +12,24 @@ enum class PlanStatus {
 
 class Plan {
     public:
+        Plan(int id,
+        const Settlement &settlement,
+        SelectionPolicy *policy,
+        const std::vector<FacilityType> &facilityOptions,
+        int lifeQuality,
+        int economy,
+        int environment,
+        std::vector<Facility*> facilities,
+        std::vector<Facility*> underConstruction);
         Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions);
            // Rule of 5
         ~Plan();                                   // Destructor
         Plan(const Plan &other);                   // Copy Constructor
-        Plan &operator=(const Plan &other);        // Copy Assignment
         Plan(Plan &&other) noexcept;               // Move Constructor
-        Plan &operator=(Plan &&other) noexcept;    // Move Assignment
 
-        const int getLifeQualityScore() const;
+        Plan cloneDeep(const std::vector<Settlement *> &settlements, const std::vector<FacilityType> &facilitiesOptions) const;
+
+        const int getlifeQualityScore() const;
         const int getEconomyScore() const;
         const int getEnvironmentScore() const;
         const int getPlanId() const;

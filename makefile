@@ -22,5 +22,7 @@ bin/%.o: src/%.cpp
 clean:
 	rm -rf bin
 
+valgrind:
+	valgrind --leak-check=full --show-reachable=yes ./bin/simulation config_file.txt
 # Phony targets
 .PHONY: all clean

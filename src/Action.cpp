@@ -161,7 +161,7 @@ void ChangePlanPolicy::act(Simulation &simulation) {
         newSelectionPolicy = new SustainabilitySelection();
     }
     else if (newPolicy == "bal") {
-        newSelectionPolicy = new BalancedSelection(plan.getLifeQualityScore(), plan.getEconomyScore(), plan.getEnvironmentScore());
+        newSelectionPolicy = new BalancedSelection(plan.getlifeQualityScore(), plan.getEconomyScore(), plan.getEnvironmentScore());
     }
     else {
         error("Cannot change selection policy");
@@ -204,8 +204,8 @@ facilityName(facilityName), facilityCategory(facilityCategory), price(price), li
 
 void AddFacility::act(Simulation &simulation)
 {
-    FacilityType* facility = new FacilityType(facilityName, facilityCategory, price, lifeQualityScore, economyScore, environmentScore);
-    if (!simulation.addFacility((*facility))) {
+    FacilityType facility = FacilityType(facilityName, facilityCategory, price, lifeQualityScore, economyScore, environmentScore);
+    if (!simulation.addFacility(facility)) {
         error("Facility already exists");
     } else {
         complete();

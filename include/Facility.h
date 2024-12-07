@@ -19,15 +19,15 @@ enum class FacilityCategory {
 class FacilityType {
     public:
         FacilityType(const string &name, const FacilityCategory category, const int price, const int lifeQuality_score, const int economy_score, const int environment_score);
-        FacilityType(const FacilityType& other);
-        FacilityType(const FacilityType &&other) noexcept;
+        // FacilityType(const FacilityType& other);
+        // FacilityType(const FacilityType &&other) noexcept;
 
-        FacilityType &operator=(FacilityType &&other) noexcept;
-        FacilityType &operator=(const FacilityType &other);
+        // FacilityType &operator=(FacilityType &&other) noexcept;
+        // FacilityType &operator=(const FacilityType &other);
 
         const string &getName() const;
         int getCost() const;
-        int getLifeQualityScore() const;
+        int getlifeQualityScore() const;
         int getEnvironmentScore() const;
         int getEconomyScore() const;
         FacilityCategory getCategory() const;
@@ -51,6 +51,7 @@ class Facility: public FacilityType {
         const string &getSettlementName() const;
         const int getTimeLeft() const;
         FacilityStatus step();
+        Facility* clone() const;
         void setStatus(FacilityStatus status);
         const FacilityStatus& getStatus() const;
         const string toString() const;
