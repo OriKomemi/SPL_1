@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-BaseAction::BaseAction() : status(ActionStatus::ERROR), errorMsg("") {}
+BaseAction::BaseAction() : errorMsg(""), status(ActionStatus::ERROR) {}
 
 void BaseAction::complete()
 {
@@ -18,7 +18,7 @@ void BaseAction::error(string msg)
 {
     errorMsg = std::move(msg);
     status = ActionStatus::ERROR;
-    std::cout << "ERROR: " + errorMsg << std::endl;
+    std::cout << "Error: " + errorMsg << std::endl;
 }
 
 const string &BaseAction::getErrorMsg() const
@@ -165,6 +165,11 @@ void ChangePlanPolicy::act(Simulation &simulation) {
         newSelectionPolicy = new BalancedSelection(plan.getlifeQualityScore(), plan.getEconomyScore(), plan.getEnvironmentScore());
     }
     else {
+        error("Cannot change selection policy");
+        return;
+    }
+    if (plan.getSelectionPolicyType() == newSelectionPolicy->toString()) {
+        delete newSelectionPolicy;
         error("Cannot change selection policy");
         return;
     }

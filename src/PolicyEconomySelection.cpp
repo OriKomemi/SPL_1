@@ -21,7 +21,7 @@ const FacilityType &EconomySelection::selectFacility(const vector<FacilityType> 
         }
     }
 
-    cout << "No economy-related facilities available." << endl;
+    throw std::runtime_error("No suitable facility found");
 }
 
 // Convert to string

@@ -21,7 +21,7 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
         }
     }
 
-    cout << "No sustainability-related facilities available." << endl;
+    throw std::runtime_error("No suitable facility found");
 }
 
 // Convert to string

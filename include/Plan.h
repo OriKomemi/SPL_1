@@ -25,7 +25,8 @@ class Plan {
            // Rule of 5
         ~Plan();                                   // Destructor
         Plan(const Plan &other);                   // Copy Constructor
-        Plan(Plan &&other) noexcept;               // Move Constructor
+        Plan &operator=(const Plan &other); //Copy operator
+        Plan(Plan &&other) noexcept; // Move Constructor
 
         Plan cloneDeep(const std::vector<Settlement *> &settlements, const std::vector<FacilityType> &facilitiesOptions) const;
 

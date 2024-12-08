@@ -31,6 +31,10 @@ const FacilityType &BalancedSelection::selectFacility(const vector<FacilityType>
 
     if (!selected) {
         cout << "Failed to select facility." << endl;
+    } else {
+        LifeQualityScore += selected->getlifeQualityScore();
+        EconomyScore += selected->getEconomyScore();
+        EnvironmentScore += selected->getEnvironmentScore();
     }
 
     return *selected;

@@ -70,6 +70,43 @@ Plan::Plan(const Plan &other)
     }
 }
 
+Plan &Plan::operator=(const Plan &other) {
+    if (this == &other) {
+        return *this;
+    }
+
+    // Clean up existing resources
+    for (auto f : facilities) { delete f; }
+    facilities.clear();
+
+    for (auto f : underConstruction) { delete f; }
+    underConstruction.clear();
+
+    delete selectionPolicy;
+    selectionPolicy = nullptr;
+
+    plan_id = other.plan_id;
+    // settlement = other.settlement; // Not possible if it's a reference and must remain from constructor
+    // settlement is a reference, so we handle appropriately with cloneDeep function when relevant
+    life_quality_score = other.life_quality_score;
+    economy_score = other.economy_score;
+    environment_score = other.environment_score;
+    selectionPolicy = other.selectionPolicy ? other.selectionPolicy->clone() : nullptr;
+
+    // Deep copy facilities
+    for (auto f : other.facilities) {
+        facilities.push_back(f->clone());
+    }
+
+    // Deep copy under construction
+    for (auto f : other.underConstruction) {
+        underConstruction.push_back(f->clone());
+    }
+
+    return *this;
+}
+
+
 
 Plan::Plan(Plan &&other) noexcept
     : plan_id(other.plan_id),
@@ -152,7 +189,7 @@ const int Plan::getPlanId() const {
 }
 
 PlanStatus Plan::getPlanStatus() {
-    if (underConstruction.size() < getConstructionLimit()) {
+    if ((int)underConstruction.size() < getConstructionLimit()) {
         status = PlanStatus::AVALIABLE;
     } else {
         status = PlanStatus::BUSY;
@@ -172,15 +209,8 @@ const int Plan::getConstructionLimit()
 
 // Set selection policy
 void Plan::setSelectionPolicy(SelectionPolicy *newSelectionPolicy) {
-    if (selectionPolicy->toString()==newSelectionPolicy->toString()) {
-        delete newSelectionPolicy;
-        std::cout << "Cannot change selection policy" << std::endl;
-    }
-    std::cout << "planID: " << plan_id << std::endl;
-    std::cout << "previousPolicy: " << selectionPolicy->toString() << std::endl;
     delete selectionPolicy; // Free old policy
     selectionPolicy = newSelectionPolicy;
-    std::cout << "newPolicy: " << selectionPolicy->toString() << std::endl;
 }
 
 // Simulate one step
@@ -207,7 +237,7 @@ void Plan::step() {
         environment_score += facility->getEnvironmentScore();
     }
     // Set status
-    if (underConstruction.size() < getConstructionLimit()) {
+    if ((int)underConstruction.size() < getConstructionLimit()) {
         status = PlanStatus::AVALIABLE;
     } else {
         status = PlanStatus::BUSY;
@@ -256,7 +286,7 @@ const vector<Facility*> &Plan::getFacilities() const {
 
 // Add a facility to under-construction
 void Plan::addFacility(Facility *facility) {
-    if (underConstruction.size() < getConstructionLimit()) {
+    if ((int)underConstruction.size() < getConstructionLimit()) {
         underConstruction.push_back(facility);
     } else {
         cout << "Construction limit reached for plan ID: " + to_string(plan_id) << endl;

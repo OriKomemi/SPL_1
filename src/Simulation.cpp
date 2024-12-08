@@ -142,9 +142,9 @@ Simulation::Simulation(const Simulation &other)
     : isRunning(other.isRunning),
       planCounter(other.planCounter),
       actionsLog(),
+      plans(),
       settlements(),
-      facilitiesOptions(other.facilitiesOptions),
-      plans()
+      facilitiesOptions(other.facilitiesOptions)
 {
     // Deep copy actionsLog
     actionsLog.reserve(other.actionsLog.size());
@@ -225,9 +225,9 @@ Simulation::Simulation(Simulation &&other) noexcept
     : isRunning(other.isRunning),
       planCounter(other.planCounter),
       actionsLog(std::move(other.actionsLog)),
+      plans(std::move(other.plans)),
       settlements(std::move(other.settlements)),
-      facilitiesOptions(std::move(other.facilitiesOptions)),
-      plans(std::move(other.plans))
+      facilitiesOptions(std::move(other.facilitiesOptions))
 {
     other.isRunning = false;
     other.planCounter = 0;
@@ -428,7 +428,7 @@ Settlement &Simulation::getSettlement(const string &settlementName)
             return *settlement;
         }
     }
-    cout << ("Settlement not found: " + settlementName) << endl;
+    throw std::runtime_error("Settlement not found");
 }
 
 // Retrieve a plan by ID
@@ -441,7 +441,7 @@ Plan &Simulation::getPlan(const int planID)
             return plan;
         }
     }
-    cout << "Plan not found: " + to_string(planID) << endl;
+    throw std::runtime_error("Plan not found: " + to_string(planID));
 }
 
 const std::vector<BaseAction *> &Simulation::getActionsLog() const
@@ -466,7 +466,6 @@ void Simulation::close()
         plan.printShortStatus();
     }
     isRunning = false;
-    cout << "Simulation closed" << endl;
 }
 
 // Open the simulation (not fully implemented)
