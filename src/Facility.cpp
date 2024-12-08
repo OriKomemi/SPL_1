@@ -13,19 +13,24 @@ Facility::Facility(const FacilityType &type, const string &settlementName)
       status(FacilityStatus::UNDER_CONSTRUCTIONS),
       timeLeft(type.getCost()) {}
 
-const string &Facility::getSettlementName() const {
+const string &Facility::getSettlementName() const
+{
     return settlementName;
 }
 
-const int Facility::getTimeLeft() const {
+const int Facility::getTimeLeft() const
+{
     return timeLeft;
 }
 
-FacilityStatus Facility::step() {
-    if (timeLeft > 0) {
+FacilityStatus Facility::step()
+{
+    if (timeLeft > 0)
+    {
         --timeLeft;
     }
-    if (timeLeft == 0) {
+    if (timeLeft == 0)
+    {
         status = FacilityStatus::OPERATIONAL;
     }
     return status;
@@ -36,15 +41,19 @@ Facility *Facility::clone() const
     return new Facility(*this);
 }
 
-void Facility::setStatus(FacilityStatus status) {
+void Facility::setStatus(FacilityStatus status)
+{
     this->status = status;
 }
 
-const FacilityStatus& Facility::getStatus() const {
+const FacilityStatus &Facility::getStatus() const
+{
     return status;
 }
 
-const string Facility::toString() const {
+const string Facility::toString() const
+{
     string statusStr = (status == FacilityStatus::UNDER_CONSTRUCTIONS) ? "UNDER_CONSTRUCTIONS" : "OPERATIONAL";
-    return "Facility: " + getName() + ", Settlement: " + settlementName + ", Status: " + statusStr + ", Time Left: " + std::to_string(timeLeft);;
+    return "Facility: " + getName() + ", Settlement: " + settlementName + ", Status: " + statusStr + ", Time Left: " + std::to_string(timeLeft);
+    ;
 }

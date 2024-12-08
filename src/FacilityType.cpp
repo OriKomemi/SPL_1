@@ -6,26 +6,32 @@ FacilityType::FacilityType(const string &name, const FacilityCategory category, 
     : name(name), category(category), price(price),
       lifeQuality_score(lifeQuality_score), economy_score(economy_score), environment_score(environment_score) {}
 
-const string &FacilityType::getName() const {
+const string &FacilityType::getName() const
+{
     return name;
 }
 
-int FacilityType::getCost() const {
+int FacilityType::getCost() const
+{
     return price;
 }
 
-int FacilityType::getlifeQualityScore() const {
+int FacilityType::getlifeQualityScore() const
+{
     return lifeQuality_score;
 }
 
-int FacilityType::getEnvironmentScore() const {
+int FacilityType::getEnvironmentScore() const
+{
     return environment_score;
 }
 
-int FacilityType::getEconomyScore() const {
+int FacilityType::getEconomyScore() const
+{
     return economy_score;
 }
 
-FacilityCategory FacilityType::getCategory() const {
+FacilityCategory FacilityType::getCategory() const
+{
     return category;
 }

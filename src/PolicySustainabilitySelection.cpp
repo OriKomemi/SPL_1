@@ -8,14 +8,18 @@ using namespace std;
 SustainabilitySelection::SustainabilitySelection() : lastSelectedIndex(-1) {}
 
 // Select facility
-const FacilityType &SustainabilitySelection::selectFacility(const vector<FacilityType> &facilitiesOptions) {
-    if (facilitiesOptions.empty()) {
+const FacilityType &SustainabilitySelection::selectFacility(const vector<FacilityType> &facilitiesOptions)
+{
+    if (facilitiesOptions.empty())
+    {
         cout << "No available facilities to select." << endl;
     }
 
-    for (size_t i = 0; i < facilitiesOptions.size(); ++i) {
+    for (size_t i = 0; i < facilitiesOptions.size(); ++i)
+    {
         size_t index = (lastSelectedIndex + 1 + i) % facilitiesOptions.size();
-        if (facilitiesOptions[index].getCategory() == FacilityCategory::ENVIRONMENT) {
+        if (facilitiesOptions[index].getCategory() == FacilityCategory::ENVIRONMENT)
+        {
             lastSelectedIndex = index;
             return facilitiesOptions[index];
         }
@@ -25,7 +29,8 @@ const FacilityType &SustainabilitySelection::selectFacility(const vector<Facilit
 }
 
 // Convert to string
-const string SustainabilitySelection::toString() const {
+const string SustainabilitySelection::toString() const
+{
     return "env";
 }
 
@@ -35,6 +40,7 @@ const string SustainabilitySelection::getPolicyType() const
 }
 
 // Clone policy
-SustainabilitySelection *SustainabilitySelection::clone() const {
+SustainabilitySelection *SustainabilitySelection::clone() const
+{
     return new SustainabilitySelection(*this);
 }

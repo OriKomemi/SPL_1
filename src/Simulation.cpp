@@ -136,8 +136,6 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
     configFile.close();
 }
 
-
-
 Simulation::Simulation(const Simulation &other)
     : isRunning(other.isRunning),
       planCounter(other.planCounter),
@@ -148,20 +146,23 @@ Simulation::Simulation(const Simulation &other)
 {
     // Deep copy actionsLog
     actionsLog.reserve(other.actionsLog.size());
-    for (auto *action : other.actionsLog) {
+    for (auto *action : other.actionsLog)
+    {
         actionsLog.push_back(action->clone());
     }
 
     // Deep copy settlements
     settlements.reserve(other.settlements.size());
-    for (Settlement *sett : other.settlements) {
+    for (Settlement *sett : other.settlements)
+    {
         settlements.push_back(new Settlement(*sett));
     }
 
     // Now that we have our copied settlements and have facilitiesOptions copied,
     // we can deep copy each plan using Plan::cloneDeep().
     plans.reserve(other.plans.size());
-    for (const auto &plan : other.plans) {
+    for (const auto &plan : other.plans)
+    {
         // cloneDeep will find the corresponding settlement inside 'settlements'
         // and create a fully deep-copied Plan.
         Plan newPlan = plan.cloneDeep(settlements, facilitiesOptions);
@@ -171,17 +172,20 @@ Simulation::Simulation(const Simulation &other)
 
 Simulation &Simulation::operator=(const Simulation &other)
 {
-    if (this == &other) {
+    if (this == &other)
+    {
         return *this; // Self-assignment check
     }
 
     // Cleanup current resources
-    for (auto *action : actionsLog) {
+    for (auto *action : actionsLog)
+    {
         delete action;
     }
     actionsLog.clear();
 
-    for (auto *settlement : settlements) {
+    for (auto *settlement : settlements)
+    {
         delete settlement;
     }
     settlements.clear();
@@ -200,19 +204,22 @@ Simulation &Simulation::operator=(const Simulation &other)
 
     // Deep copy actionsLog
     actionsLog.reserve(other.actionsLog.size());
-    for (auto *action : other.actionsLog) {
+    for (auto *action : other.actionsLog)
+    {
         actionsLog.push_back(action->clone());
     }
 
     // Deep copy settlements
     settlements.reserve(other.settlements.size());
-    for (Settlement *sett : other.settlements) {
+    for (Settlement *sett : other.settlements)
+    {
         settlements.push_back(new Settlement(*sett));
     }
 
     // Deep copy plans using Plan::cloneDeep()
     plans.reserve(other.plans.size());
-    for (const auto &plan : other.plans) {
+    for (const auto &plan : other.plans)
+    {
         // Use cloneDeep for a fully deep-copied Plan
         Plan newPlan = plan.cloneDeep(settlements, facilitiesOptions);
         plans.push_back(std::move(newPlan));
