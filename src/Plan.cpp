@@ -14,9 +14,8 @@ Plan::Plan(const int planId,
            int environment_score,
            std::vector<Facility *> facilities,
            std::vector<Facility *> underConstruction)
-    : Plan(planId, settlement, selectionPolicy, facilityOptions) // Delegate to first constructor
+    : Plan(planId, settlement, selectionPolicy, facilityOptions)
 {
-    // Additional initialization
     this->life_quality_score = life_quality_score;
     this->economy_score = economy_score;
     this->environment_score = environment_score;
@@ -267,7 +266,7 @@ void Plan::step()
     life_quality_score = economy_score = environment_score = 0;
     for (Facility *facility : facilities)
     {
-        life_quality_score += facility->getlifeQualityScore();
+        life_quality_score += facility->getLifeQualityScore();
         economy_score += facility->getEconomyScore();
         environment_score += facility->getEnvironmentScore();
     }

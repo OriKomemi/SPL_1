@@ -16,7 +16,7 @@ int FacilityType::getCost() const
     return price;
 }
 
-int FacilityType::getlifeQualityScore() const
+int FacilityType::getLifeQualityScore() const
 {
     return lifeQuality_score;
 }
