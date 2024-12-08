@@ -5,25 +5,24 @@
 
 using namespace std;
 
-Plan::Plan(int id,
+Plan::Plan(const int planId,
            const Settlement &settlement,
-           SelectionPolicy *policy,
+           SelectionPolicy *selectionPolicy,
            const std::vector<FacilityType> &facilityOptions,
-           int lifeQuality,
-           int economy,
-           int environment,
-           std::vector<Facility*> facilities,
-           std::vector<Facility*> underConstruction)
-    : plan_id(id),
-      settlement(settlement),
-      selectionPolicy(policy),
-      facilityOptions(facilityOptions),
-      life_quality_score(lifeQuality),
-      economy_score(economy),
-      environment_score(environment),
-      facilities(std::move(facilities)),
-      underConstruction(std::move(underConstruction)),
-      status(PlanStatus::AVALIABLE) {}
+           int life_quality_score,
+           int economy_score,
+           int environment_score,
+           std::vector<Facility *> facilities,
+           std::vector<Facility *> underConstruction)
+    : Plan(planId, settlement, selectionPolicy, facilityOptions) // Delegate to first constructor
+{
+    // Additional initialization
+    this->life_quality_score = life_quality_score;
+    this->economy_score = economy_score;
+    this->environment_score = environment_score;
+    this->facilities = std::move(facilities);
+    this->underConstruction = std::move(underConstruction);
+}
 
 Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *selectionPolicy, const vector<FacilityType> &facilityOptions)
     : plan_id(planId),
@@ -38,15 +37,17 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
       environment_score(0) {}
 
 Plan::~Plan() {
-    for (Facility* facility : facilities) {
-        delete facility;
+    for (auto f : facilities) {
+        delete f;
     }
-
-    for (Facility* facility : underConstruction) {
-        delete facility;
+    facilities.clear();
+    for (auto f : underConstruction) {
+        delete f;
     }
-
-    delete selectionPolicy;
+    underConstruction.clear();
+    if (selectionPolicy) {
+        delete selectionPolicy;
+    }
 }
 
 Plan::Plan(const Plan &other)
@@ -84,12 +85,14 @@ Plan::Plan(Plan &&other) noexcept
     other.selectionPolicy = nullptr; // Nullify moved-from pointer
 }
 
-Plan Plan::cloneDeep(const std::vector<Settlement *> &settlements, const std::vector<FacilityType> &facilitiesOptions) const {
-    // Find corresponding Settlement
+Plan Plan::cloneDeep(const std::vector<Settlement *> &settlements,
+                     const std::vector<FacilityType> &facilitiesOptions) const
+{
+    // Find corresponding Settlement by name
     Settlement *newSettlement = nullptr;
-    for (Settlement *copiedSettlement : settlements) {
-        if (copiedSettlement->getName() == settlement.getName()) {
-            newSettlement = copiedSettlement;
+    for (Settlement *currentSettlement : settlements) {
+        if (currentSettlement->getName() == settlement.getName()) {
+            newSettlement = currentSettlement;
             break;
         }
     }
@@ -100,28 +103,33 @@ Plan Plan::cloneDeep(const std::vector<Settlement *> &settlements, const std::ve
     }
 
     // Deep copy facilities
-    std::vector<Facility *> copiedFacilities;
+    std::vector<Facility *> newFacilities;
+    newFacilities.reserve(facilities.size());
     for (Facility *facility : facilities) {
-        copiedFacilities.push_back(facility->clone());
+        newFacilities.push_back(facility->clone());
     }
 
     // Deep copy under-construction facilities
-    std::vector<Facility *> copiedUnderConstruction;
+    std::vector<Facility *> newUnderConstruction;
+    newUnderConstruction.reserve(underConstruction.size());
     for (Facility *facility : underConstruction) {
-        copiedUnderConstruction.push_back(facility->clone());
+        newUnderConstruction.push_back(facility->clone());
     }
+
+    // Clone selectionPolicy if exists
+    SelectionPolicy *newPolicy = selectionPolicy ? selectionPolicy->clone() : nullptr;
 
     // Create and return the new Plan object
     return Plan(
         plan_id,
         *newSettlement,
-        selectionPolicy ? selectionPolicy->clone() : nullptr,
+        newPolicy,
         facilitiesOptions,
         life_quality_score,
         economy_score,
         environment_score,
-        std::move(copiedFacilities),
-        std::move(copiedUnderConstruction)
+        std::move(newFacilities),
+        std::move(newUnderConstruction)
     );
 }
 

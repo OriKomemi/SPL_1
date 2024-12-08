@@ -14,9 +14,9 @@ void BaseAction::complete()
     status = ActionStatus::COMPLETED;
 }
 
-void BaseAction::error(string errorMsg)
+void BaseAction::error(string msg)
 {
-    errorMsg = std::move(errorMsg);
+    errorMsg = std::move(msg);
     status = ActionStatus::ERROR;
     std::cout << "ERROR: " + errorMsg << std::endl;
 }
@@ -188,6 +188,9 @@ const std::string ChangePlanPolicy::toString() const {
 Close::Close() {}
 
 void Close::act(Simulation &simulation) {
+    delete backupSim;
+    backupSim = nullptr;
+
     simulation.close();
     complete(); // Mark action as completed
 }

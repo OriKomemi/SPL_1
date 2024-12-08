@@ -14,11 +14,11 @@ class Simulation {
     public:
         Simulation(const string &configFilePath);
         Simulation(const Simulation &other);
-        Simulation(const Simulation &&other);
+        Simulation(Simulation &&other) noexcept;
         Simulation& operator=(const Simulation &other);
-        // Simulation& operator=(const Simulation &&other);
-
+        Simulation &operator=(Simulation &&other) noexcept;
         ~Simulation();
+
         void start();
         void addPlan(const Settlement &settlement, SelectionPolicy *selectionPolicy);
         void addAction(BaseAction *action);
