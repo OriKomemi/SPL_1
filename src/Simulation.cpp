@@ -111,7 +111,7 @@ Simulation::Simulation(const string &configFilePath) : isRunning(false), planCou
 }
 
 Simulation::Simulation(const Simulation &other): isRunning(other.isRunning),
-      planCounter(other.planCounter) {
+      planCounter(other.planCounter), facilitiesOptions(facilitiesOptions) {
 
     for (const auto &action : other.actionsLog) {
         actionsLog.push_back(action->clone());
@@ -119,10 +119,6 @@ Simulation::Simulation(const Simulation &other): isRunning(other.isRunning),
 
     for (const auto &settlement : other.settlements) {
         settlements.push_back(new Settlement(*settlement));
-    }
-
-    for (const auto &facilityOption : other.facilitiesOptions) {
-        facilitiesOptions.push_back(facilityOption);
     }
 
     // Deep copy the plans vector
@@ -203,13 +199,11 @@ Simulation::~Simulation() {
 }
 
 void Simulation::clear() {
-    // Delete dynamically allocated actions
     for (BaseAction* action : actionsLog) {
         delete action;
     }
     actionsLog.clear();
 
-    // Delete dynamically allocated settlements
     for (Settlement* settlement : settlements) {
         delete settlement;
     }

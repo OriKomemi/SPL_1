@@ -18,6 +18,7 @@ void BaseAction::error(string errorMsg)
 {
     errorMsg = std::move(errorMsg);
     status = ActionStatus::ERROR;
+    std::cout << "ERROR: " + errorMsg << std::endl;
 }
 
 const string &BaseAction::getErrorMsg() const

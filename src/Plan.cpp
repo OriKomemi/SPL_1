@@ -38,17 +38,15 @@ Plan::Plan(const int planId, const Settlement &settlement, SelectionPolicy *sele
       environment_score(0) {}
 
 Plan::~Plan() {
+    for (Facility* facility : facilities) {
+        delete facility;
+    }
+
+    for (Facility* facility : underConstruction) {
+        delete facility;
+    }
+
     delete selectionPolicy;
-
-    for (auto facility : facilities) {
-        delete facility;
-    }
-    facilities.clear();
-    for (auto facility : underConstruction) {
-        delete facility;
-    }
-    underConstruction.clear();
-
 }
 
 Plan::Plan(const Plan &other)
@@ -94,6 +92,11 @@ Plan Plan::cloneDeep(const std::vector<Settlement *> &settlements, const std::ve
             newSettlement = copiedSettlement;
             break;
         }
+    }
+
+    // Ensure newSettlement is valid
+    if (!newSettlement) {
+        throw std::runtime_error("Settlement not found for cloning Plan");
     }
 
     // Deep copy facilities

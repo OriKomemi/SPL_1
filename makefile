@@ -23,6 +23,6 @@ clean:
 	rm -rf bin
 
 valgrind:
-	valgrind --leak-check=full --show-reachable=yes ./bin/simulation config_file.txt
+	valgrind --leak-check=full --show-reachable=yes --track-origins=yes ./bin/simulation config_file.txt
 # Phony targets
 .PHONY: all clean
